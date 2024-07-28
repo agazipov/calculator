@@ -1,0 +1,42 @@
+.inputs {
+    width: 100%;
+    padding: 0 47px;
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.inputs__input {
+    padding-bottom: 28px;
+    
+    width: inherit;
+    height: 117px;
+    
+    display: flex;
+    align-items: end;
+    justify-content: end;
+    
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 32px;
+    text-align: right;
+}
+
+.inputs__result {
+    padding-bottom: 18px;
+    
+    width: inherit;
+    height: 76px;
+
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 80px;
+    text-align: right;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.inputs__dash {
+    border-bottom: 2px solid #ffffffa8;
+}
