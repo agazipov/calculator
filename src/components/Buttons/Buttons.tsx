@@ -1,14 +1,11 @@
 import React, { memo } from 'react';
 import Button from '../Button/Button';
 import { KEYBORD } from '../../lib/constants';
+import { useMathAction } from '../../context/mathProvider/hooks';
 import * as styles from './style.module.scss';
-import { useMathAction, useMathCalculate } from '../../context/mathProvider/hooks';
 
 const Buttons: React.FC = memo(() => {
-    const { handleButtonClick, handleClear } = useMathAction();
-    const { handleCalculate } = useMathCalculate();
-    
-    console.log('render');
+    const { handleButtonClick, handleClear, handleCalculate } = useMathAction();
 
     return (
         <div className={styles.buttons}>

@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { MathContext, MathContextActions, MathContextCalculate } from "./context";
+import { MathContext, MathContextActions } from "./context";
 
 export const useMathValue = () => {
   const context = useContext(MathContext);
@@ -11,14 +11,6 @@ export const useMathValue = () => {
 
 export const useMathAction = () => {
   const context = useContext(MathContextActions);
-  if (!context) {
-    throw new Error("useMathAction must be used within a MathProvider");
-  }
-  return context;
-};
-
-export const useMathCalculate = () => {
-  const context = useContext(MathContextCalculate);
   if (!context) {
     throw new Error("useMathAction must be used within a MathProvider");
   }

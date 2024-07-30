@@ -3,12 +3,12 @@ import * as styles from './style.module.scss';
 import { useMathValue } from '../../context/mathProvider/hooks';
 
 const Inputs: React.FC = () => {
-    const { input, result } = useMathValue();
+    const { value } = useMathValue();
 
     return (
         <div className={styles.inputs}>
-            <div className={styles.inputs__input}>{input}</div>
-            <div className={styles.inputs__result}>{result}</div>
+            <div className={styles.inputs__input}>{value.input}</div>
+            <div className={styles.inputs__result}>{value.result}</div>
             <div className={styles.inputs__dash}></div>
         </div>
     );

@@ -1,19 +1,15 @@
 import React from "react";
+import { IValue } from "../../types/types";
 
 interface IMathService {
-    input: string;
-    result: string;
+    value: IValue
 }
 
 interface IMathServiceActions {
     handleButtonClick: (value: string) => void;
     handleClear: () => void;
-}
-
-interface IMathServiceCalculate {
     handleCalculate: () => void;
 }
 
 export const MathContext = React.createContext<IMathService | null>(null);
 export const MathContextActions = React.createContext<IMathServiceActions | null>(null);
-export const MathContextCalculate = React.createContext<IMathServiceCalculate | null>(null);
