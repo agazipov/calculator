@@ -1,42 +1,26 @@
 import { useContext } from "react";
-import { MathContext } from "./context";
+import { MathContext, MathContextActions, MathContextCalculate } from "./context";
 
-export const useMathClick = () => {
+export const useMathValue = () => {
   const context = useContext(MathContext);
   if (!context) {
-    throw new Error("useMathClick must be used within a MathProvider");
+    throw new Error("useMathValue must be used within a MathProvider");
   }
-  return context.handleButtonClick;
+  return context;
 };
 
-export const useMathClear = () => {
-  const context = useContext(MathContext);
+export const useMathAction = () => {
+  const context = useContext(MathContextActions);
   if (!context) {
-    throw new Error("useMathClear must be used within a MathProvider");
+    throw new Error("useMathAction must be used within a MathProvider");
   }
-  return context.handleClear;
+  return context;
 };
 
-export const useMathCalculated = () => {
-  const context = useContext(MathContext);
+export const useMathCalculate = () => {
+  const context = useContext(MathContextCalculate);
   if (!context) {
-    throw new Error("useMathCalculated must be used within a MathProvider");
+    throw new Error("useMathAction must be used within a MathProvider");
   }
-  return context.handleCalculate;
-};
-
-export const useMathInput = () => {
-  const context = useContext(MathContext);
-  if (!context) {
-    throw new Error("useMathInput must be used within a MathProvider");
-  }
-  return context.input;
-};
-
-export const useMathResult = () => {
-  const context = useContext(MathContext);
-  if (!context) {
-    throw new Error("useMathResult must be used within a MathProvider");
-  }
-  return context.result;
+  return context;
 };

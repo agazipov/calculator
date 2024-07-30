@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Button from '../Button/Button';
 import { KEYBORD } from '../../lib/constants';
 import * as styles from './style.module.scss';
-import { useMathCalculated, useMathClear, useMathClick } from '../../context/mathProvider/hooks';
+import { useMathAction, useMathCalculate } from '../../context/mathProvider/hooks';
 
-const Buttons: React.FC = () => {
-    const handleButtonClick = useMathClick();
-    const handleClear = useMathClear();
-    const handleCalculate = useMathCalculated();
+const Buttons: React.FC = memo(() => {
+    const { handleButtonClick, handleClear } = useMathAction();
+    const { handleCalculate } = useMathCalculate();
+    
+    console.log('render');
 
     return (
         <div className={styles.buttons}>
@@ -23,6 +24,6 @@ const Buttons: React.FC = () => {
             <Button label='=' style={styles.custom} onClick={handleCalculate} />
         </div>
     );
-};
+});
 
 export default Buttons;

@@ -1,11 +1,10 @@
 import React from 'react';
 import * as styles from './style.module.scss';
-import { useMathInput, useMathResult } from '../../context/mathProvider/hooks';
+import { useMathValue } from '../../context/mathProvider/hooks';
 
 const Inputs: React.FC = () => {
-    const input = useMathInput();
-    const result = useMathResult();
-    
+    const { input, result } = useMathValue();
+
     return (
         <div className={styles.inputs}>
             <div className={styles.inputs__input}>{input}</div>

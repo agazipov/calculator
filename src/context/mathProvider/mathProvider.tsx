@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AdvancedExpressionEvaluator } from "../../utils/mathParser";
 import { DUPLICATION, INITIAL_STATE_RESULT, KEYBORD_LISTENER } from "../../lib/constants";
 import { formatNumber } from "../../lib/functions";
-import { MathContext } from "./context";
+import { MathContext, MathContextActions, MathContextCalculate } from "./context";
 
 const evaluator = new AdvancedExpressionEvaluator();
 
@@ -15,6 +15,8 @@ export const MathProvider: React.FC<ProviderProps> = ({ children }) => {
     const [result, setResult] = useState<string>(INITIAL_STATE_RESULT);
 
     useEffect(() => {
+        console.log('useEffect');
+
         const keypress = (e: KeyboardEvent) => {
             (document.activeElement as HTMLElement)?.blur();
             if (KEYBORD_LISTENER.find(symbol => symbol === e.key)) {
@@ -41,7 +43,7 @@ export const MathProvider: React.FC<ProviderProps> = ({ children }) => {
         return () => {
             window.removeEventListener('keydown', keypress);
         };
-    }, [input]);
+    }, []);
 
     const handleButtonClick = useCallback((value: string) => {
         setInput(prev => {
@@ -75,14 +77,25 @@ export const MathProvider: React.FC<ProviderProps> = ({ children }) => {
     const mathService = useMemo(() => ({
         input,
         result,
+    }), [input, result]);
+
+    const mathServiceActions = useMemo(() => ({
         handleButtonClick,
         handleCalculate,
         handleClear
-    }), [input, result, handleButtonClick, handleCalculate, handleClear]);
+    }), [handleButtonClick, handleCalculate, handleClear]);
+
+    const mathServiceCalculate = useMemo(() => ({
+        handleCalculate,
+    }), [handleCalculate]);
 
     return (
         <MathContext.Provider value={mathService}>
-            {children}
+            <MathContextActions.Provider value={mathServiceActions}>
+                <MathContextCalculate.Provider value={mathServiceCalculate}>
+                    {children}
+                </MathContextCalculate.Provider>
+            </MathContextActions.Provider>
         </MathContext.Provider>
     );
 };
