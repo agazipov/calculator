@@ -3,18 +3,21 @@ import Button from '../Button/Button';
 import { KEYBORD } from '../../lib/constants';
 import { useMathAction } from '../../context/mathProvider/hooks';
 import * as styles from './style.module.scss';
+import { EXTENDS_KEYBORD } from '../../context/mathProvider/mathProvider';
 
 const Buttons: React.FC = memo(() => {
     const { handleButtonClick, handleClear, handleCalculate } = useMathAction();
+    const KEY = EXTENDS_KEYBORD.concat(KEYBORD);
 
     return (
         <div className={styles.buttons}>
-            {KEYBORD.map(button => {
+            <Button label='C' onClick={handleClear} />
+            {KEY.map(button => {
                 return (
                     <Button
                         key={button}
                         label={button}
-                        onClick={button !== 'C' ? handleButtonClick : handleClear}
+                        onClick={handleButtonClick}
                     />
                 )
             })}

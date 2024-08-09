@@ -1,35 +1,91 @@
-export class ExpressionEvaluator {
-    precedence: { [key: string]: number };
+export interface Operation {
+    symbol: string;
+    precedence: number;
+    evaluate(stack: number[]): number[];
+}
 
-    constructor() {
-        this.precedence = {
-            '+': 1,
-            '-': 1,
-            '*': 2,
-            '/': 2,
+export class ExpressionEvaluator {
+    private static instance: ExpressionEvaluator;
+    private operations: { [key: string]: Operation };
+
+    private constructor() {
+        this.operations = {
+            '+': {
+                symbol: '+',
+                precedence: 1,
+                evaluate: (stack) => {
+                    let b = stack.pop() ?? 0;
+                    let a = stack.pop() ?? 0;
+                    stack.push(a + b);
+                    return stack;
+                }
+            },
+            '-': {
+                symbol: '-',
+                precedence: 1,
+                evaluate: (stack) => {
+                    let b = stack.pop() ?? 0;
+                    let a = stack.pop() ?? 0;
+                    stack.push(a - b);
+                    return stack;
+                }
+            },
+            '*': {
+                symbol: '*',
+                precedence: 2,
+                evaluate: (stack) => {
+                    let b = stack.pop() ?? 0;
+                    let a = stack.pop() ?? 0;
+                    stack.push(a * b);
+                    return stack;
+                }
+
+            },
+            '/': {
+                symbol: '/',
+                precedence: 2,
+                evaluate: (stack) => {
+                    let b = stack.pop() ?? 0;
+                    let a = stack.pop() ?? 0;
+                    if (b === 0) throw new Error('Division by zero');
+                    stack.push(a / b);
+                    return stack;
+                }
+            },
         };
     }
 
-    isOperator(c: string): boolean {
-        return c in this.precedence;
+    public static getInstance(): ExpressionEvaluator {
+        if (!ExpressionEvaluator.instance) {
+            ExpressionEvaluator.instance = new ExpressionEvaluator();
+        }
+        return ExpressionEvaluator.instance;
     }
 
-    replaceSymbol(expression: string): string {
+    public registerOperation(operation: Operation) {
+        this.operations[operation.symbol] = operation;
+    }
+
+    private isOperator(c: string): boolean {
+        return c in this.operations;
+    }
+
+    private replaceSymbol(expression: string): string {
         return expression.replace(/,/g, '.').replace(/×/g, '*');
     }
 
-    duplicationChek(expression: string): string {
+    private duplicationChek(expression: string): string {
         for (let i = 0; i < expression.length - 1; i++) {
             if (this.isOperator(expression[i]) && this.isOperator(expression[i + 1])) {
-                throw new Error("Duplicate operators");
+                throw new Error('Duplicate operators');
             }
         }
         return expression;
     }
 
-    infixToPostfix(expression: string): string[] {
+    private infixToPostfix(expression: string): string[] {
         if (!expression.trim()) {
-            throw new Error("Expression is empty");
+            throw new Error('Expression is empty');
         }
 
         let output: string[] = [];
@@ -54,25 +110,27 @@ export class ExpressionEvaluator {
             } else if (c === ')') {
                 bracketCount--;
                 if (bracketCount < 0) {
-                    throw new Error("SyntaxError");
+                    throw new Error('SyntaxError');
                 }
                 while (operators.length > 0 && operators[operators.length - 1] !== '(') {
                     output.push(operators.pop() ?? '');
                 }
                 operators.pop();
             } else if (this.isOperator(c)) {
-                if (c === '-' && (i === 0 || expression[i - 1] === '(')) {
+                if (c === '-' && (i === 0 || expression[i - 1] === '(') || this.isOperator(expression[i - 1])) {
                     output.push('0');
                 }
-                while (operators.length > 0 && this.precedence[operators[operators.length - 1]] >= this.precedence[c]) {
+                while (operators.length > 0 && operators[operators.length - 1] !== '(' && this.operations[operators[operators.length - 1]].precedence >= this.operations[c].precedence) {
                     output.push(operators.pop() ?? '');
                 }
                 operators.push(c);
+            } else {
+                throw new Error('Unknown operation');
             }
         }
 
         if (bracketCount !== 0) {
-            throw new Error("SyntaxError");
+            throw new Error('SyntaxError');
         }
 
         while (operators.length > 0) {
@@ -82,85 +140,24 @@ export class ExpressionEvaluator {
         return output;
     }
 
-    evaluatePostfix(postfix: string[]): number {
+    private evaluatePostfix(postfix: string[]): number {
         let stack: number[] = [];
         for (let token of postfix) {
             if (!isNaN(parseFloat(token))) {
                 stack.push(parseFloat(token));
             } else {
-                let b = stack.pop() ?? 0;
-                let a = stack.pop() ?? 0;
-                switch (token) {
-                    case '+':
-                        stack.push(a + b);
-                        break;
-                    case '-':
-                        stack.push(a - b);
-                        break;
-                    case '*':
-                        stack.push(a * b);
-                        break;
-                    case '/':
-                        if (b === 0) throw new Error("Division by zero");
-                        stack.push(a / b);
-                        break;
-                }
+                let operation = this.operations[token];
+                operation.evaluate(stack);
             }
         }
 
         return stack.pop() ?? 0;
     }
 
-    evaluateExpression(expression: string): number {
+    public evaluateExpression(expression: string): number {
         expression = this.replaceSymbol(expression);
         expression = this.duplicationChek(expression);
         let postfix = this.infixToPostfix(expression);
         return this.evaluatePostfix(postfix);
-    }
-}
-
-export class AdvancedExpressionEvaluator extends ExpressionEvaluator {
-    constructor() {
-        super();
-        this.precedence['%'] = 3;
-        this.precedence['√'] = 4;
-    }
-
-    evaluatePostfix(postfix: string[]): number {
-        let stack: number[] = [];
-
-        for (let token of postfix) {
-            if (!isNaN(parseFloat(token))) {
-                stack.push(parseFloat(token));
-            } else {
-                let b = stack.pop() ?? 0;
-                let a = stack.pop() ?? 0;
-                switch (token) {
-                    case '+':
-                        stack.push(a + b);
-                        break;
-                    case '-':
-                        stack.push(a - b);
-                        break;
-                    case '*':
-                        stack.push(a * b);
-                        break;
-                    case '/':
-                        if (b === 0) throw new Error("Division by zero");
-                        stack.push(a / b);
-                        break;
-                    case '%':
-                        stack.push(a);
-                        stack.push(b / 100);
-                        break;
-                    case '√':
-                        stack.push(a);
-                        stack.push(Math.sqrt(b));
-                        break;
-                }
-            }
-        }
-
-        return stack.pop() ?? NaN;
     }
 }

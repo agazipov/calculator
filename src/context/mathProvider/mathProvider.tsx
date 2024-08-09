@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { AdvancedExpressionEvaluator } from "../../utils/mathParser";
+import { ExpressionEvaluator } from "../../utils/mathParser";
 import { DUPLICATION, INITIAL_STATE, KEYBORD_LISTENER } from "../../lib/constants";
 import { formatNumber } from "../../lib/functions";
 import { MathContext, MathContextActions } from "./context";
 import { IValue } from "../../types/types";
+import { extensionOfCalculator, newOperations } from "../../plugins/extensionOfCalculator";
 
-const evaluator = new AdvancedExpressionEvaluator();
+export const EXTENDS_KEYBORD = extensionOfCalculator(newOperations);
+const evaluator = ExpressionEvaluator.getInstance();
 
 interface ProviderProps {
     children: React.ReactNode;
