@@ -18,6 +18,15 @@ export class ExpressionEvaluator {
         return expression.replace(/,/g, '.').replace(/×/g, '*');
     }
 
+    duplicationChek(expression: string): string {
+        for (let i = 0; i < expression.length - 1; i++) {
+            if (this.isOperator(expression[i]) && this.isOperator(expression[i + 1])) {
+                throw new Error("Duplicate operators");
+            }
+        }
+        return expression;
+    }
+
     infixToPostfix(expression: string): string[] {
         if (!expression.trim()) {
             throw new Error("Expression is empty");
@@ -25,6 +34,7 @@ export class ExpressionEvaluator {
 
         let output: string[] = [];
         let operators: string[] = [];
+        let bracketCount = 0;
 
         for (let i = 0; i < expression.length; i++) {
             let c = expression[i];
@@ -36,18 +46,33 @@ export class ExpressionEvaluator {
                 }
                 output.push(num);
             } else if (c === '(') {
+                bracketCount++;
+                if (!this.isOperator(expression[i - 1]) && i !== 0) {
+                    operators.push('*');
+                }
                 operators.push(c);
             } else if (c === ')') {
+                bracketCount--;
+                if (bracketCount < 0) {
+                    throw new Error("SyntaxError");
+                }
                 while (operators.length > 0 && operators[operators.length - 1] !== '(') {
                     output.push(operators.pop() ?? '');
                 }
                 operators.pop();
             } else if (this.isOperator(c)) {
+                if (c === '-' && (i === 0 || expression[i - 1] === '(')) {
+                    output.push('0');
+                }
                 while (operators.length > 0 && this.precedence[operators[operators.length - 1]] >= this.precedence[c]) {
                     output.push(operators.pop() ?? '');
                 }
                 operators.push(c);
             }
+        }
+
+        if (bracketCount !== 0) {
+            throw new Error("SyntaxError");
         }
 
         while (operators.length > 0) {
@@ -88,6 +113,7 @@ export class ExpressionEvaluator {
 
     evaluateExpression(expression: string): number {
         expression = this.replaceSymbol(expression);
+        expression = this.duplicationChek(expression);
         let postfix = this.infixToPostfix(expression);
         return this.evaluatePostfix(postfix);
     }
@@ -135,6 +161,6 @@ export class AdvancedExpressionEvaluator extends ExpressionEvaluator {
             }
         }
 
-        return stack.pop() ?? 0;
+        return stack.pop() ?? NaN;
     }
 }

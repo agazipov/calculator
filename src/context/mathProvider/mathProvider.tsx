@@ -60,11 +60,11 @@ export const MathProvider: React.FC<ProviderProps> = ({ children }) => {
             try {
                 if (!prev.input) return INITIAL_STATE;
                 return {
-                    input: '',
+                    ...prev,
                     result: formatNumber(evaluator.evaluateExpression(prev.input)).replace(/\./, ',')
                 };
             } catch (error: any) {
-                return { input: '', result: error.message || 'Error' };
+                return { ...prev, result: error.message || 'Error' };
             }
         });
     }, [evaluator]);

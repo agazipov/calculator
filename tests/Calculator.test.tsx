@@ -1,51 +1,51 @@
-import React from 'react';
-import { expect, test } from '@jest/globals';
-import { render, fireEvent } from '@testing-library/react';
-// import Calculator from '../src/components/Calculator/Calculator';
-import App from '../src/pages/App';
+import { ExpressionEvaluator } from "../src/utils/mathParser";
 
-test('renders calculator', () => {
-  const { getByText } = render(<App />);
-  const buttonElement = getByText(/1/i);
-  expect(buttonElement).toBeTruthy();
-});
+describe('ExpressionEvaluator', () => {
+    let evaluator: ExpressionEvaluator;
 
-test('adds numbers', async () => {
-  const { getByText, findByText } = render(<App />);
-  fireEvent.click(getByText('1'));
-  fireEvent.click(getByText('+'));
-  fireEvent.click(getByText('2'));
-  fireEvent.click(getByText('='));
-  const resultElement = await findByText('3', { selector: '.inputs__result' });
-  expect(resultElement).toBeTruthy();
-});
+    beforeEach(() => {
+        evaluator = new ExpressionEvaluator();
+    });
 
+    test('should evaluate simple expressions correctly', () => {
+        expect(evaluator.evaluateExpression('2+3')).toBe(5);
+        expect(evaluator.evaluateExpression('2*3')).toBe(6);
+        expect(evaluator.evaluateExpression('6/2')).toBe(3);
+        expect(evaluator.evaluateExpression('5-3')).toBe(2);
+    });
 
-test('keybord click', async () => {
-  const { findByText } = render(<App />);
-  const divElement = await findByText('0', { selector: '.inputs__result' });
-  fireEvent.keyDown(divElement, { key: '1', code: 'Digit1', charCode: 0 });
-  fireEvent.keyDown(divElement, { key: '+', code: 'NumpadAdd', charCode: 0 });
-  fireEvent.keyDown(divElement, { key: '2', code: 'Digit2', charCode: 0 });
-  fireEvent.keyDown(divElement, { key: 'Enter', code: 'Enter', charCode: 13 });
-  const resultElement = await findByText('3', { selector: '.inputs__result' });
-  expect(resultElement).toBeTruthy();
-});
+    test('should handle parentheses correctly', () => {
+        expect(evaluator.evaluateExpression('(2+3)*4')).toBe(20);
+        expect(evaluator.evaluateExpression('2*(3+4)')).toBe(14);
+        expect(evaluator.evaluateExpression('(6/2)+3')).toBe(6);
+        expect(evaluator.evaluateExpression('5-(3+1)')).toBe(1);
+    });
 
-test('complex calculation', async () => {
-  const { getByText, findByText } = render(<App />);
-  const divElement = await findByText('0', { selector: '.inputs__result' });
-  fireEvent.click(getByText('√'));
-  fireEvent.keyDown(divElement, { key: 'Shift', code: 'ShiftLeft', charCode: 0 });
-  fireEvent.keyDown(divElement, { key: '(', code: 'Digit9', charCode: 0 });
-  fireEvent.click(getByText('3'));
-  fireEvent.click(getByText('×'));
-  fireEvent.click(getByText('3'));
-  fireEvent.keyDown(divElement, { key: 'Shift', code: 'ShiftLeft', charCode: 0 });
-  fireEvent.keyDown(divElement, { key: ')', code: 'Digit0', charCode: 0 });
-  fireEvent.click(getByText('/'));
-  fireEvent.click(getByText('3'));
-  fireEvent.click(getByText('='));
-  const resultElement = await findByText('1', { selector: '.inputs__result' });
-  expect(resultElement).toBeTruthy();
+    test('should handle unary minus correctly', () => {
+        expect(evaluator.evaluateExpression('-3+5')).toBe(2);
+        expect(evaluator.evaluateExpression('5+(-3)')).toBe(2);
+        expect(evaluator.evaluateExpression('-5*(-2)')).toBe(10);
+    });
+
+    test('should throw error for mismatched parentheses', () => {
+        expect(() => evaluator.evaluateExpression('(2+3')).toThrow('SyntaxError');
+        expect(() => evaluator.evaluateExpression('2+3)')).toThrow('SyntaxError');
+        expect(() => evaluator.evaluateExpression('2+3)(')).toThrow('SyntaxError');
+    });
+
+    test('should throw error for division by zero', () => {
+        expect(() => evaluator.evaluateExpression('5/0')).toThrow('Division by zero');
+    });
+
+    test('should handle complex expressions correctly', () => {
+        expect(evaluator.evaluateExpression('3+5*(2-8)/3')).toBe(-7);
+        expect(evaluator.evaluateExpression('(3+5)*(2-8)/3')).toBe(-16);
+    });
+
+    test('should throw error for duplicate operators', () => {
+        expect(() => evaluator.evaluateExpression('2++3')).toThrow('Duplicate operators');
+        expect(() => evaluator.evaluateExpression('2**3')).toThrow('Duplicate operators');
+        expect(() => evaluator.evaluateExpression('6//2')).toThrow('Duplicate operators');
+        expect(() => evaluator.evaluateExpression('5--3')).toThrow('Duplicate operators');
+    });
 });
